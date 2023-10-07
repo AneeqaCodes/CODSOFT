@@ -1,0 +1,42 @@
+#Task 1 (Data Science Internship)
+#Titanic Survival Project
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+#load the titanic dataset from builtin datasets of seaborn
+titanic=sns.load_dataset('titanic')
+#remove the missing values from "age" and "embarked" columns
+titanic.dropna(subset=['age','embarked'], inplace=True)
+#perform one hot-encoding on categoral variables to convert them into numeric value
+titanic=pd.get_dummies (titanic, drop_first=True)
+X=titanic.drop (columns=['survived'])
+Y=titanic ['survived']
+#split the data into features X and target variable Y
+#20% used for testing and while rest is used for training of model
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+#if features deviates from eachother and not on same scale that's why apply Standardscalar technique
+scaler=StandardScaler()
+X_train =scaler.fit_transform(X_train)
+X_test= scaler.transform (X_test)
+#build and train logistic regression model
+modelTitanic = LogisticRegression()
+modelTitanic.fit(X_train,Y_train)
+#Prediction
+Y_pred=modelTitanic.predict(X_test)
+#calculate accuracy of prediction
+accuracy= accuracy_score(Y_test,Y_pred)
+print(f"Accuracy:{accuracy:.2f}")
+#creating a bar chart for visualization of results
+plt.figure(figsize=(6,4))
+sns.countplot(x='survived',data=titanic, palette='Set2')
+plt.xticks([0,1], ['Not Survived', 'Survived'])
+plt.title("Titanic Passenger Survival")
+plt.xlabel("Survival Status")
+plt.ylabel("Count")
+plt.show()
