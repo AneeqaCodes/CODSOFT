@@ -1,1 +1,69 @@
+#Task #2
+#classification of iris flowers into different species based on their sepal and petal measurements.
+ 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+
+ # Load the Iris dataset
+iris = sns.load_dataset('iris')
+
+rows = iris.head(10)
+print(rows)
+iris.shape
+rows.describe()
+# Visualize the whole dataset based on species
+sns.set(style="ticks")
+sns.pairplot(iris, hue="species", palette="Set2")
+X = iris.drop('species', axis=1)
+y = iris['species']
+# Split the data into training and testing sets (e.g., 80% for training and 20% for testing)
+X_train, X_test, y_train, y_test = train_test_split(X, y , test_size=0.2, random_state=42)
+
+# Create and train a Random Forest classifier
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred = rf_model.predict(X_test)
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Display a classification report
+print(classification_report(y_test, y_pred))
+
+# Display a confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:")
+print(conf_matrix)
+
+# Visualize feature importance
+feature_names = iris.columns
+importance = rf_model.feature_importances_
+sorted_indices = np.argsort(importance)[::-1]
+sorted_feature_names = feature_names[sorted_indices]
+sorted_importance = importance[sorted_indices]
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x=sorted_importance, y=sorted_feature_names)
+plt.title("Feature Importance")
+plt.xlabel("Importance")
+plt.ylabel("Features")
+plt.xticks(rotation=45)  
+plt.show()
+X_new = np.array([
+    [8.2, 9.1, 4.4, 2],
+    [4.9, 2.2, 3.8, 1.1],
+    [5.3, 2.5, 4.6, 1.9]
+])
+#Prediction of the species from the input vector
+prediction = rf_model.predict(X_new)
+print("Prediction of Species: {}".format(prediction))
 
